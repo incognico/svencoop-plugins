@@ -25,6 +25,3 @@ ltibm | https://github.com/ltibm?tab=repositories | multiple
 Zode | https://github.com/Zode/AFBase | AFBase
 Zode | https://github.com/Zode/AFBaseExpansions | AFBaseExpansions
 Sw1ft | https://github.com/r47t/Update-Fixes | UpdateFixes
-multiple | https://github.com/incognico/svencoop_plugins/tree/master/scripts/plugins | multiple *
-
-\* = Old, archived snapshot of the twilightzone server script folder, no longer updated. The scripts in there might be modified version of the original ones. Some of my old not-officially-released plugins are in there too, as well as a few plugins who were lost with the removal of the SC forums, thus I will keep this repo around.
