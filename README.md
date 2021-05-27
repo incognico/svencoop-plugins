@@ -1,10 +1,11 @@
 Some of my AngelScript plugins for Sven Co-op.
 
-* The folder `mirror` is where I will put plugins of other authors, those who don't seem to be hosted anywhere aynmore and were lost with the removal of the removal of the SC forums
-* The plugins in the folder `twlz` are twilightzone server specific and can't/should'nt be used (without modifications) but might be interesting for reference
+* Plugins in the folder `mirror` are of other authors, those who don't seem to be hosted anywhere aynmore and were lost with the removal of the SC forums
+* In the folder `twlz` are twilightzone server specific plugins who can't/shouldn't be used (without modifications) but might be interesting too look at for reference
+* In `modified` reside a few random modified plugins of other authors which I edited/extended for twlz
 
 ## Places of Sven Co-op plugins from other authors
-As the forums are gone and there is no central plugin registry, most plugin are scattered around the web, hence this list to at least have a bit of a entry point to find plugins. General rule of thumb: Also check the other repositories of the linked users, there might be more Sven Co-op plugin repos or other related stuff. Pull requests welcome.
+As the forums are gone and there is no central plugin registry, most plugin are scattered around the web, hence this list to at least have a bit of a entry point to find plugins. General rule of thumb: Also check the other repositories of the linked users, there might be more Sven Co-op plugin repos or other related stuff.
 
 Author | Link | Description
 ------ | ---- | -----------
@@ -25,3 +26,5 @@ ltibm | https://github.com/ltibm?tab=repositories | multiple
 Zode | https://github.com/Zode/AFBase | AFBase
 Zode | https://github.com/Zode/AFBaseExpansions | AFBaseExpansions
 Sw1ft | https://github.com/r47t/Update-Fixes | UpdateFixes
+
+Pull requests welcome.
