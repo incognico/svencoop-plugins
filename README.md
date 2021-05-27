@@ -20,6 +20,8 @@ MrOats | https://github.com/MrOats/AngelScript_SC_Plugins | multiple
 Rizulix | https://github.com/Rizulix/Random-Plugins | multiple
 DrAbcrealone | https://github.com/DrAbcrealone/AngelScripts | multiple
 kmkz27 | https://github.com/kmkz27/Sven-Co-op-scripts | multiple
+CubeMath | https://github.com/CubeMath/UCHFastDL2/tree/master/svencoop/scripts/plugins | multiple
+ltibm | https://github.com/ltibm?tab=repositories | multiple
 Zode | https://github.com/Zode/AFBase | AFBase
 Zode | https://github.com/Zode/AFBaseExpansions | AFBaseExpansions
 Sw1ft | https://github.com/r47t/Update-Fixes | UpdateFixes
