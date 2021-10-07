@@ -1,6 +1,6 @@
 void RelaySay( string message )
 {
-  message = message.Replace( "\n", "" ); // stip any newlines, ChatBridge.as takes care
+  message = message.Replace( "\n", "" ); // strip any newlines, ChatBridge.as takes care
  
   const string targetname  = "twlz_tmp_" + Math.RandomLong( 0, Math.INT32_MAX );
   const string caller      = g_Module.GetModuleName();
