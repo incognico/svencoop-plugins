@@ -265,7 +265,7 @@ const string tohex( const string_t st ) {
 
   const string s = string( st );
   for ( uint i = 0; i < s.Length(); i++ ) {
-    hex += formatInt( s[i], "h" );
+    hex += formatUInt( s[i], "h" );
   }
   
   return hex;
