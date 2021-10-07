@@ -194,7 +194,7 @@ HookReturnCode ClientSay( SayParameters@ pParams ) {
   const string status  = ( observer ? "observer" : ( survival ? ( alive ? "alive" : "dead" ) : "player" ) );
 
   if ( !message.IsEmpty() ) {
-    AppendFromSven( "<" + status + "><" + pPlayer.pev.netname + "><" + string(ips[steamId]) + "><" + steamId + "> " + message + "\n" );
+    AppendFromSven( "<" + status + "><" + tohex(pPlayer.pev.netname) + "><" + string(ips[steamId]) + "><" + steamId + "> " + message + "\n" );
   }
 
   return HOOK_CONTINUE;
@@ -208,7 +208,7 @@ HookReturnCode ClientPutInServer( CBasePlayer@ pPlayer ) {
   if ( ips.exists( pPlayer.pev.netname ) )
     ips.delete( pPlayer.pev.netname );
 
-  AppendFromSven( "<+><" + pPlayer.pev.netname + "><" + string(ips[steamId]) + "><" + steamId + "> has joined the game\n" );
+  AppendFromSven( "<+><" + tohex(pPlayer.pev.netname) + "><" + string(ips[steamId]) + "><" + steamId + "> has joined the game\n" );
 
   return HOOK_CONTINUE;
 }
@@ -216,7 +216,7 @@ HookReturnCode ClientPutInServer( CBasePlayer@ pPlayer ) {
 HookReturnCode ClientDisconnect( CBasePlayer@ pPlayer ) {
   const string steamId = g_EngineFuncs.GetPlayerAuthId( pPlayer.edict() );
 
-  AppendFromSven( "<-><" + pPlayer.pev.netname + "><" + string(ips[steamId]) + "><" + steamId + "> has left the game\n" );
+  AppendFromSven( "<-><" + tohex(pPlayer.pev.netname) + "><" + string(ips[steamId]) + "><" + steamId + "> has left the game\n" );
 
   if ( ips.exists( steamId ) )
     ips.delete( steamId );
@@ -258,4 +258,15 @@ HookReturnCode ClientConnected( edict_t@, const string& in szPlayerName, const s
   ips[szPlayerName] = szIPAddress;
 
   return HOOK_CONTINUE;
+}
+
+const string tohex( const string_t st ) {
+  string hex;
+
+  const string s = string( st );
+  for ( uint i = 0; i < s.Length(); i++ ) {
+    hex += formatInt( s[i], "h" );
+  }
+  
+  return hex;
 }
