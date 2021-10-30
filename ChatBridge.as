@@ -162,7 +162,7 @@ HookReturnCode MapChange() {
       if ( active.find( ipKeys[i] ) < 0 )
       {
         if ( ( ipKeys[i].SubString(0, 8) ) == "STEAM_0:" )
-          AppendFromSven( "<-><\\orphan><><" + ipKeys[i] + "> has left the game\n" );
+          AppendFromSven( "<->\\<\\orphan>\\<><" + ipKeys[i] + "> has left the game\n" );
 
         ips.delete( ipKeys[i] );
       }
