@@ -2,15 +2,16 @@
 // - zoomable weapons set the fov directly, holding a zoomable weapon in spook mode just breaks the fov
 //   and resets it to default. even when swiching to a non-zoomable weapon it stays broken (default).
 // - pev values on the player by the game are applied AFTER PlayerSpawn hook, workaround: short Timeout
+// - minor issue: helpers are basically godmoded while they are nonsolid, thus I spawn em with very low hp
+// probably fixed:
 // - no way to detect if player was revived, maxspeed also set after revive by the game overriding custom
 //   value. because of this the maxspeed value has to be set in SpookThink which leads to other problems:
 // - some custom weapons and especially the minigun also change the players maxspeed value,
 //   as soon as SpookThinks alters it the speed is fast again, even with the minigun,
 //   thus I ignore custom entities and weapon_minigun but still the minigun uses a factor for setting
 //   maxspeed on the player, derived from sv_maxspeed, so you are faster with the minigun while this is on
-// - minor issue: helpers are basically godmoded while they are nonsolid, thus I spawn em with very low hp
 
-#include "MapBlacklist"
+#include "inc/MapBlacklist"
 
 // settings
 const bool g_togglesolid        = true;
@@ -26,12 +27,12 @@ const string g_batterymodel     = "models/twlz/pumpkin_blue_fb.mdl";
 const string g_snarkmodel       = "models/keenhalloween/pumpkinsnark.mdl";
 const string g_crabmodel        = "models/hallohospital/m/handcrab.mdl";
 const string g_voltimodel       = "models/sa13/baby_voltigore.mdl";
-const string g_painsound        = "twlz/cry.ogg";
+const string g_painsound        = "twlz/cry.wav";
 const string g_spooksound       = "tur/scream2.wav";
-const string g_effectsound      = "twlz/trickortreat.ogg";
+const string g_effectsound      = "twlz/trickortreat.wav";
 const array<string> g_monsters  = { "monster_headcrab", "monster_babycrab", "monster_snark", "monster_shockroach", "monster_alien_babyvoltigore" };
-const float hallostart          = 1572436800.0;
-const float halloend            = 1572652740.0;
+const float hallostart          = 1635588000.0;
+const float halloend            = 1635807600.0;
 ///////////
 
 dictionary g_Counter;
@@ -41,7 +42,6 @@ CScheduledFunction@ g_SolidThink = null;
 CScheduledFunction@ g_SpookThink = null;
 bool g_SolidState = false;
 int g_ghost = 0;
-float maxspeed = 270.0;
 
 class PlayerState {
     EHandle pPlayer;
@@ -204,15 +204,17 @@ void MapActivate() {
     if ( g_replaceitemmodels )
         ReplaceItemModels();
 
+/*
     if ( !MapBlacklisted() ) {
         maxspeed = g_EngineFuncs.CVarGetFloat( "sv_maxspeed" );
         g_EngineFuncs.CVarSetFloat( "sv_maxspeed", maxspeed*g_spookspeedfactor );
     }
+*/
 }
 
 HookReturnCode PlayerSpawn( CBasePlayer@ pPlayer ) {
     if ( !MapBlacklisted() )
-        g_Scheduler.SetTimeout( "ResetPlayer", 0.1666, EHandle( pPlayer ) );
+        g_Scheduler.SetTimeout( "ResetPlayer", 0.1666f, EHandle( pPlayer ) );
 
     return HOOK_CONTINUE;
 }
@@ -461,7 +463,6 @@ void ReplaceItemModels() {
     }
 }
 
-
 // taken from BleedOut.as, credits to Zorbos & w00tguy123
 PlayerState@ getPlayerState( CBasePlayer@ pPlayer ) {
     string steamId = g_EngineFuncs.GetPlayerAuthId( pPlayer.edict() );
@@ -497,14 +498,16 @@ void SpookThink() {
             if ( pState.reportState == 1 ) {
                 SpookEffect( pPlayer );
             }
+            /*
             else if ( pPlayer.m_hActiveItem.GetEntity() !is null ) {
                 CBaseEntity@ pEnt = cast<CBaseEntity@>( pPlayer.m_hActiveItem.GetEntity() );
 
                 if ( pEnt !is null && ( pEnt.GetClassname() != "weapon_minigun" || g_CustomEntityFuncs.IsCustomEntity( pEnt.GetClassname() ) ) )
-                    pPlayer.pev.maxspeed = maxspeed;
+                    pPlayer.SetMaxSpeedOverride(-1);
             }
+            */
             else {
-                 pPlayer.pev.maxspeed = maxspeed;
+                pPlayer.SetMaxSpeedOverride(-1);
             }
         }
    } while ( pEntity !is null );
@@ -514,8 +517,8 @@ void SpookEffect( CBasePlayer@ pPlayer ) {
     setRenderMode( pPlayer, kRenderNormal, kRenderFxGlowShell, 66.0f, Vector( 235, 97, 35 ) );
     g_PlayerFuncs.ScreenFade( pPlayer, Vector( 235, 97, 35 ), 3.666, 1.666, 236, FFADE_MODULATE | FFADE_IN );
     pPlayer.pev.fov = pPlayer.m_iFOV = 115;
-    pPlayer.pev.maxspeed = maxspeed*g_spookspeedfactor;
     pPlayer.pev.punchangle.x = Math.RandomFloat( -0.00, -6.66 );
+    pPlayer.SetMaxSpeedOverride(int(ceil(pPlayer.GetMaxSpeed()*g_spookspeedfactor)));
 
     NetworkMessage spook( MSG_BROADCAST, NetworkMessages::SVC_TEMPENTITY );
     spook.WriteByte( TE_FIREFIELD );
@@ -548,7 +551,7 @@ void ResetPlayer( EHandle& in player ) {
 
         pState.reportState = 0;
 
-        pPlayer.pev.maxspeed = maxspeed;
+        pPlayer.SetMaxSpeedOverride(-1);
     }
 }
 
