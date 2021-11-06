@@ -20,6 +20,8 @@ CClientCommand g_ListMissingModels( "listmissingplayermodels", "List missing pla
 array<string> g_ModelList;
 array<string> g_missing_list;
 array<string> precachedModels;
+array<string> g_LastModelList; // list of models that were precached on the previous map
+string g_last_precache_map = "";
 
 HookReturnCode MapChange() {
   for ( int i = 1; i <= g_Engine.maxClients; i++ ) {
@@ -58,6 +60,11 @@ void AddToList( EHandle ePlayer ) {
 }
 
 void MapInit() {
+  if (g_Engine.mapname == g_last_precache_map) {
+    // player models break fastdl if new ones are precached on a map restart. Wait for a new map to precache more models.
+    g_ModelList = g_LastModelList;
+  }
+
   g_missing_list.resize( 0 );
   precachedModels.resize( 0 );
 
@@ -71,8 +78,13 @@ void MapInit() {
     }
 
     if ( playerModelFileExists(model) ) {
-      g_Game.PrecacheModel( "models/player/" + model );
-      precachedModels.insertLast(g_ModelList[i]);
+      string path = "models/player/" + model;
+	  if (path.Length() < 65) {
+	    g_Game.PrecacheModel( "models/player/" + model );
+        precachedModels.insertLast(g_ModelList[i]);
+	  } else {
+	    g_Log.PrintF("[PlayerModelPrecacheDyn] Player model precache failed (65+ chars): " + path + "\n");
+	  }
     } else {
         g_missing_list.insertLast(g_ModelList[i]);
     }
@@ -91,6 +103,9 @@ void MapInit() {
   g_EntityFuncs.CreateEntity( "info_target", keys, true );
 
   g_ModelList.resize( 0 );
+  
+  g_LastModelList = g_ModelList;
+  g_last_precache_map = g_Engine.mapname;
 }
 
 bool playerModelFileExists(string path) {
