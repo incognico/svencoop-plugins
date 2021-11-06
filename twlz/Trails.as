@@ -3,6 +3,7 @@
 // - trail menu (lol)
 
 #include "inc/RelaySay"
+#include "inc/MetaChads"
 
 const bool onbydefault = true;
 
@@ -340,6 +341,9 @@ HookReturnCode ClientPutInServer(CBasePlayer@ plr) {
   }
   else {
     g_player_states[idx] = PlayerState();
+
+    if (IsMetaChad(plr))
+      g_player_states[idx].dlight = true;
 
     if (onbydefault)
       TrailEnable(plr);
@@ -791,8 +795,8 @@ class CustomPlayerTrail : ScriptBaseEntity {
     }
     else if (g_Engine.time > killtime) {
       if (revived) {
-      	NetworkMessage m(MSG_PVS, NetworkMessages::SVC_TEMPENTITY, self.pev.origin );
-	      m.WriteByte(TE_IMPLOSION);
+        NetworkMessage m(MSG_PVS, NetworkMessages::SVC_TEMPENTITY, self.pev.origin );
+          m.WriteByte(TE_IMPLOSION);
           m.WriteCoord(self.pev.origin.x);
           m.WriteCoord(self.pev.origin.y);
           m.WriteCoord(self.pev.origin.z-24.0f);
@@ -855,17 +859,17 @@ class CustomPlayerTrail : ScriptBaseEntity {
         for (int i = 1; i <= g_Engine.maxClients; i++) {
           if (g_player_states[i].ishere && g_player_states[i].dlight) {
             NetworkMessage m2(MSG_ONE_UNRELIABLE, NetworkMessages::SVC_TEMPENTITY, g_EntityFuncs.IndexEnt(i));
-	          m2.WriteByte(TE_DLIGHT);
-	          m2.WriteCoord(self.pev.origin.x);
-	          m2.WriteCoord(self.pev.origin.y);
-	          m2.WriteCoord(self.pev.origin.z);
-	          m2.WriteByte(Math.clamp(6, 10, self.pev.iuser1+5));
-	          m2.WriteByte(dlcolor.r);
-	          m2.WriteByte(dlcolor.g);
-	          m2.WriteByte(dlcolor.b);
-	          m2.WriteByte(detached ? (islast ? life : 2) : g_player_states[owneridx].lastlife);
+              m2.WriteByte(TE_DLIGHT);
+              m2.WriteCoord(self.pev.origin.x);
+              m2.WriteCoord(self.pev.origin.y);
+              m2.WriteCoord(self.pev.origin.z);
+              m2.WriteByte(Math.clamp(6, 10, self.pev.iuser1+5));
+              m2.WriteByte(dlcolor.r);
+              m2.WriteByte(dlcolor.g);
+              m2.WriteByte(dlcolor.b);
+              m2.WriteByte(detached ? (islast ? life : 2) : g_player_states[owneridx].lastlife);
               m2.WriteByte(1);
-	        m2.End();
+            m2.End();
           }
         }
 
@@ -1043,17 +1047,17 @@ class CustomPlayerTrail : ScriptBaseEntity {
     const float _life = Math.RandomFloat(3.33f, 6.66f);
 
     NetworkMessage m2(MSG_PVS, NetworkMessages::SVC_TEMPENTITY, self.pev.origin);
-	  m2.WriteByte(TE_DLIGHT);
-	  m2.WriteCoord(self.pev.origin.x);
-	  m2.WriteCoord(self.pev.origin.y);
-	  m2.WriteCoord(self.pev.origin.z);
-	  m2.WriteByte(12);
-	  m2.WriteByte(250);
-	  m2.WriteByte(250);
-	  m2.WriteByte(250);
-	  m2.WriteByte(uint8(_life*10));
-	  m2.WriteByte(1);
-	m2.End();
+      m2.WriteByte(TE_DLIGHT);
+      m2.WriteCoord(self.pev.origin.x);
+      m2.WriteCoord(self.pev.origin.y);
+      m2.WriteCoord(self.pev.origin.z);
+      m2.WriteByte(12);
+      m2.WriteByte(250);
+      m2.WriteByte(250);
+      m2.WriteByte(250);
+      m2.WriteByte(uint8(_life*10));
+      m2.WriteByte(1);
+    m2.End();
 
     self.pev.scale      = PHI*5;
     self.pev.movetype   = MOVETYPE_NOCLIP;
@@ -1119,5 +1123,5 @@ void dot(const Vector origin) {
     m.WriteCoord(origin.x);
     m.WriteCoord(origin.y);
     m.WriteCoord(origin.z+1);
-   m.End();
+  m.End();
 }
