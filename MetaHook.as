@@ -25,6 +25,7 @@ CClientCommand g_ReportMetahookPlugin("mh_reportplugin", "ReportPluginInfo", @Re
 
 void MapInit() {
   metachads = 0;
+  valid.Resize(0);
 
   dictionary keys = {
     { "targetname", "_MetaChads" },
@@ -66,9 +67,7 @@ void Invalid(const string szSteamId) {
 }
 
 const bool IsValid(const string szSteamId) {
-  const int idx = valid.find(szSteamId);
-
-  if (idx >= 0)
+  if (valid.find(szSteamId) >= 0)
     return true;
 
   return false;
