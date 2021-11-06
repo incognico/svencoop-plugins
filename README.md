@@ -1,11 +1,11 @@
 Some of my AngelScript plugins for Sven Co-op.
 
-* Plugins in the folder `mirror` are of other authors, those who don't seem to be hosted anywhere aynmore and were lost with the removal of the SC forums
+* Plugins in the folder `mirror` are of other authors, those who don't seem to be hosted anywhere anymore and were lost with the removal of the SC forums
 * In the folder `twlz` are twilightzone server specific plugins who can't/shouldn't be used (without modifications) but might be interesting too look at for reference
 * In `modified` reside a few random modified plugins of other authors which I edited/extended for twlz
 
 ## Places of Sven Co-op plugins from other authors
-As the forums are gone and there is no central plugin registry, most plugin are scattered around the web, hence this list to at least have a bit of a entry point to find plugins. General rule of thumb: Also check the other repositories of the linked users, there might be more Sven Co-op plugin repos or other related stuff.
+As the forums are gone and there is no central plugin registry, most plugin are scattered around the web, hence this list, to at least have a bit of an entry point to find plugins. General rule of thumb: Also check the other repositories of the linked users, there might be more Sven Co-op plugin repos or other related stuff.
 
 Author | Link | Description
 ------ | ---- | -----------
