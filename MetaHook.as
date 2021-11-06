@@ -1,6 +1,7 @@
 const string bitskey = "$s_bits";
 uint metachads = 0; // bitfield
 int chadent = -1;
+array<string> valid;
 
 void PluginInit() {
   g_Module.ScriptInfo.SetAuthor("incognico");
@@ -11,7 +12,7 @@ void PluginInit() {
 
   CBaseEntity@ oldchadent = g_EntityFuncs.FindEntityByTargetname(null, "_MetaChads");
 
-  if (g_EntityFuncs.IsValidEntity(oldchadent.edict())) {
+  if (oldchadent !is null && g_EntityFuncs.IsValidEntity(oldchadent.edict())) {
     chadent = g_EntityFuncs.EntIndex(oldchadent.edict());
     CustomKeyvalues@ chadkv = oldchadent.GetCustomKeyvalues();
 
@@ -57,11 +58,31 @@ HookReturnCode ClientDisconnect(CBasePlayer@ plr) {
   return HOOK_CONTINUE;
 }
 
+void Invalid(const string szSteamId) {
+  const int idx = valid.find(szSteamId);
+
+  if (idx >= 0)
+    valid.removeAt(idx);
+}
+
+const bool IsValid(const string szSteamId) {
+  const int idx = valid.find(szSteamId);
+
+  if (idx >= 0)
+    return true;
+
+  return false;
+}
+
 void RequestPlugins(EHandle eplr) {
   if (!eplr)
     return;
 
   CBasePlayer@ plr = cast<CBasePlayer@>(eplr.GetEntity());
+
+  const string szSteamId = g_EngineFuncs.GetPlayerAuthId(plr.edict());
+  valid.insertLast(szSteamId);
+  g_Scheduler.SetTimeout("Invalid", 2.0f, szSteamId);
 
   NetworkMessage message(MSG_ONE, NetworkMessages::NetworkMessageType(146), plr.edict());
     message.WriteLong(1); // Query plugin list
@@ -70,8 +91,9 @@ void RequestPlugins(EHandle eplr) {
 
 void ReportPluginInfo(const CCommand@ args) {
   CBasePlayer@ plr = g_ConCommandSystem.GetCurrentPlayer();
+  const string szSteamId = g_EngineFuncs.GetPlayerAuthId(plr.edict());
 
-  if (args.ArgC() >= 4) {
+  if (IsValid(szSteamId) && args.ArgC() >= 4) {
     g_EngineFuncs.ServerPrint("[MetaHookPlugins " + plr.pev.netname + "] #" + args[1] + " :: apiver: " + args[2] + " :: name: " + args[3] + " :: ver: " + args[4] + "\n");
 
     if (!IsChad(plr)) {

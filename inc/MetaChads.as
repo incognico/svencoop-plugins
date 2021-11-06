@@ -1,10 +1,14 @@
 // Query MetaChads: const bool IsMetaChad(CBasePlayer@);
+//
+// If used early (eg. ClientPutInServer), use SetTimeout("func", 3.0f) (at least >2.0f!)
+// so the client has enough time to report back, otherwise it is probably a race condition
+//
 // Requires MetaHook.as
 
 const bool IsMetaChad(CBasePlayer@ plr) {
   CBaseEntity@ chadent = g_EntityFuncs.FindEntityByTargetname(null, "_MetaChads");
 
-  if (g_EntityFuncs.IsValidEntity(chadent.edict())) {
+  if (chadent !is null && g_EntityFuncs.IsValidEntity(chadent.edict())) {
     const string bitskey = "$s_bits";
     CustomKeyvalues@ chadkv = chadent.GetCustomKeyvalues();
 
