@@ -17,8 +17,7 @@ const bool IsMetaChad(CBasePlayer@ plr) {
       const uint uiPlrBit = (1 << (plr.entindex() & 31));
       return bits & uiPlrBit == uiPlrBit;
     }
-    else {
-      return false;
-    }
   }
+
+  return false;
 }

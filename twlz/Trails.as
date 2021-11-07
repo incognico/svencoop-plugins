@@ -329,6 +329,18 @@ const bool isNumeric(const string arg) {
   return true;
 }
 
+void MetaHookSpecial(EHandle eplr) {
+  if (!eplr)
+    return;
+
+  CBasePlayer@ plr = cast<CBasePlayer@>(eplr.GetEntity());
+
+  if (IsMetaChad(plr)) {
+    g_player_states[plr.entindex()].dlight = true;
+    g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "DLight was auto-enabled because you are a MetaChad.\n");
+  }
+}
+
 HookReturnCode ClientPutInServer(CBasePlayer@ plr) {
   const string steamid = g_EngineFuncs.GetPlayerAuthId(plr.edict());
   const int idx = plr.entindex();
@@ -342,11 +354,10 @@ HookReturnCode ClientPutInServer(CBasePlayer@ plr) {
   else {
     g_player_states[idx] = PlayerState();
 
-    if (IsMetaChad(plr))
-      g_player_states[idx].dlight = true;
-
     if (onbydefault)
       TrailEnable(plr);
+
+    g_Scheduler.SetTimeout("MetaHookSpecial", 3.0f, EHandle(plr));
   }
 
   g_player_states[idx].ishere = true;
