@@ -29,7 +29,7 @@ void MapInit() {
 
   dictionary keys = {
     { "targetname", "_MetaChads" },
-    { bitskey, string_t(metachads) }
+    { bitskey, string(metachads) }
   };
   CBaseEntity@ ent = g_EntityFuncs.CreateEntity("info_target", keys, true);
   chadent = g_EntityFuncs.EntIndex(ent.edict());
