@@ -22,9 +22,10 @@ void PluginInit() {
       metachads = atoui((chadkv.GetKeyvalue(bitskey)).GetString());
     }
     else {
-      CBaseEntity@ del = g_EntityFuncs.Instance(oldchadent);
+      CBaseEntity@ del = g_EntityFuncs.Instance(oldchadent.edict());
       g_EntityFuncs.Remove(del);
       MapInit();
+    }
   }
   else {
     MapInit();
@@ -118,7 +119,7 @@ void UpdateEnt() {
   if (chadent != -1) {
     CBaseEntity@ ent = g_EntityFuncs.Instance(chadent);
     CustomKeyvalues@ chadkv = ent.GetCustomKeyvalues();
-    chadkv.SetKeyvalue(bitskey, string_t(string(metachads)));
+    chadkv.SetKeyvalue(bitskey, string_t(metachads));
   }
 }
 
