@@ -13,7 +13,7 @@ const bool IsMetaChad(CBasePlayer@ plr) {
     CustomKeyvalues@ chadkv = chadent.GetCustomKeyvalues();
 
     if (chadkv.HasKeyvalue(bitskey)) {
-      const uint bits = atoui(chadkv.GetKeyvalue(bitskey).GetString());
+      const uint bits = atoui((chadkv.GetKeyvalue(bitskey)).GetString());
       const uint uiPlrBit = (1 << (plr.entindex() & 31));
       return bits & uiPlrBit == uiPlrBit;
     }

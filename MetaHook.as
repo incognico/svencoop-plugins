@@ -1,3 +1,5 @@
+const bool verbose = false;
+
 const string bitskey = "$s_bits";
 uint metachads = 0; // bitfield
 int chadent = -1;
@@ -16,12 +18,21 @@ void PluginInit() {
     chadent = g_EntityFuncs.EntIndex(oldchadent.edict());
     CustomKeyvalues@ chadkv = oldchadent.GetCustomKeyvalues();
 
-    if (chadkv.HasKeyvalue(bitskey))
-      metachads = atoui(chadkv.GetKeyvalue(bitskey).GetString());
+    if (chadkv.HasKeyvalue(bitskey)) {
+      metachads = atoui((chadkv.GetKeyvalue(bitskey)).GetString());
+    }
+    else {
+      CBaseEntity@ del = g_EntityFuncs.Instance(oldchadent);
+      g_EntityFuncs.Remove(del);
+      MapInit();
+  }
+  else {
+    MapInit();
   }
 }
 
 CClientCommand g_ReportMetahookPlugin("mh_reportplugin", "ReportPluginInfo", @ReportPluginInfo);
+CClientCommand g_ListChads("chads", "ListChads", @ListChads);
 
 void MapInit() {
   metachads = 0;
@@ -29,7 +40,7 @@ void MapInit() {
 
   dictionary keys = {
     { "targetname", "_MetaChads" },
-    { bitskey, string(metachads) }
+    { bitskey, "" + metachads }
   };
   CBaseEntity@ ent = g_EntityFuncs.CreateEntity("info_target", keys, true);
   chadent = g_EntityFuncs.EntIndex(ent.edict());
@@ -93,7 +104,8 @@ void ReportPluginInfo(const CCommand@ args) {
   const string szSteamId = g_EngineFuncs.GetPlayerAuthId(plr.edict());
 
   if (IsValid(szSteamId) && args.ArgC() >= 4) {
-    g_EngineFuncs.ServerPrint("[MetaHookPlugins " + plr.pev.netname + "] #" + args[1] + " :: apiver: " + args[2] + " :: name: " + args[3] + " :: ver: " + args[4] + "\n");
+    if (verbose)
+      g_EngineFuncs.ServerPrint("[MetaHookPlugins " + plr.pev.netname + "] #" + args[1] + " :: apiver: " + args[2] + " :: name: " + args[3] + " :: ver: " + args[4] + "\n");
 
     if (!IsChad(plr)) {
       ChadEnable(plr);
@@ -106,8 +118,31 @@ void UpdateEnt() {
   if (chadent != -1) {
     CBaseEntity@ ent = g_EntityFuncs.Instance(chadent);
     CustomKeyvalues@ chadkv = ent.GetCustomKeyvalues();
-    chadkv.SetKeyvalue(bitskey, string_t(metachads));
+    chadkv.SetKeyvalue(bitskey, string_t(string(metachads)));
   }
+}
+
+void ListChads(const CCommand@ args) {
+  CBasePlayer@ plr = g_ConCommandSystem.GetCurrentPlayer();
+
+  g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "CHADS (MetaHookSv users)\n------------------------\n");
+
+  bool chads = false;
+
+  for (int i = 1; i <= g_Engine.maxClients; i++) {
+    CBasePlayer@ chad = g_PlayerFuncs.FindPlayerByIndex(i);
+
+    if (chad is null || !chad.IsConnected())
+      continue;
+
+    if (IsChad(chad)) {
+      chads = true;
+      g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "- " + chad.pev.netname + "\n");
+    }
+  }
+
+  if (!chads)
+    g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "none\n");
 }
 
 void ChadEnable(CBasePlayer@ plr) {
