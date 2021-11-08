@@ -129,7 +129,7 @@ void ListChads(const CCommand@ args) {
 
   g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "CHADS (MetaHookSv users)\n------------------------\n");
 
-  bool chads = false;
+  array<string> tmp;
 
   for (int i = 1; i <= g_Engine.maxClients; i++) {
     CBasePlayer@ chad = g_PlayerFuncs.FindPlayerByIndex(i);
@@ -137,14 +137,22 @@ void ListChads(const CCommand@ args) {
     if (chad is null || !chad.IsConnected())
       continue;
 
-    if (IsChad(chad)) {
-      chads = true;
-      g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "- " + chad.pev.netname + "\n");
-    }
+    if (IsChad(chad))
+      tmp.insertLast(string(chad.pev.netname));
   }
 
-  if (!chads)
+  if (tmp.length() > 0) {
+    tmp.sort(function(a,b) { return a.ICompareN(b, 64) < b.ICompareN(a, 64); });
+
+    for (uint i = 0; i < tmp.length(); i++) {
+      g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "- " + tmp[i] + "\n");
+    }
+
+    tmp.resize(0);
+  }
+  else {
     g_PlayerFuncs.ClientPrint(plr, HUD_PRINTCONSOLE, "none\n");
+  }
 }
 
 void ChadEnable(CBasePlayer@ plr) {
