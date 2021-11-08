@@ -227,9 +227,9 @@ const bool doCommand(CBasePlayer@ plr, const CCommand@ args, bool inConsole) {
       }
       else if (arg == "info") {
         if (g_player_states[idx].usingpalette)
-          g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "Color hue is currently automatically managed by palette: " + string(g_player_states[idx].palette).ToUppercase() + ". Glow is " + (g_player_states[idx].glow ? "ON" : "OFF") + ". DLight is " + (g_player_states[idx].dlight ? "ON" : "OFF") + ".\n");
+          g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "Color hue is currently automatically managed by palette: " + string(g_player_states[idx].palette).ToUppercase() + ". Glow is " + (g_player_states[idx].glow ? "ON" : "OFF") + ". DLights are " + (g_player_states[idx].dlight ? "ON" : "OFF") + ".\n");
         else
-          g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "Color hue is currently set to: " + (g_player_states[idx].hue > -1.0f ? formatFloat(floor(g_player_states[idx].hue*360+0.5f)) : "RANDOM") + ". Glow is " + (g_player_states[idx].glow ? "ON" : "OFF")  + ". DLight is " + (g_player_states[idx].dlight ? "ON" : "OFF") + ".\n");
+          g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "Color hue is currently set to: " + (g_player_states[idx].hue > -1.0f ? formatFloat(floor(g_player_states[idx].hue*360+0.5f)) : "RANDOM") + ". Glow is " + (g_player_states[idx].glow ? "ON" : "OFF")  + ". DLights are " + (g_player_states[idx].dlight ? "ON" : "OFF") + ".\n");
       }
       else if (arg == "glow" || arg == "noglow") {
         if (arg.Length() == 4)
@@ -245,7 +245,7 @@ const bool doCommand(CBasePlayer@ plr, const CCommand@ args, bool inConsole) {
         else
           g_player_states[idx].dlight = false;
 
-        g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "DLight is now " + (g_player_states[idx].dlight ? "ON" : "OFF") + ".\n");
+        g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "DLights are now " + (g_player_states[idx].dlight ? "ON" : "OFF") + ".\n");
       }
       else if (arg == "r" || arg == "random" || arg == "-1") {
         g_player_states[idx].hue = -1.0f;
@@ -334,10 +334,11 @@ void MetaHookSpecial(EHandle eplr) {
     return;
 
   CBasePlayer@ plr = cast<CBasePlayer@>(eplr.GetEntity());
+  const int idx = plr.entindex();
 
-  if (IsMetaChad(plr)) {
-    g_player_states[plr.entindex()].dlight = true;
-    g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "DLight was auto-enabled because you are a MetaChad.\n");
+  if (IsMetaChad(plr) && !g_player_states[idx].dlight) {
+    g_player_states[idx].dlight = true;
+    g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "DLights were auto-enabled because you are a MetaChad.\n");
   }
 }
 
