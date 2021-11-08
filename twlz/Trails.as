@@ -357,7 +357,7 @@ HookReturnCode ClientPutInServer(CBasePlayer@ plr) {
     if (onbydefault)
       TrailEnable(plr);
 
-    g_Scheduler.SetTimeout("MetaHookSpecial", 3.0f, EHandle(plr));
+    g_Scheduler.SetTimeout("MetaHookSpecial", 2.0f, EHandle(plr));
   }
 
   g_player_states[idx].ishere = true;

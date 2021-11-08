@@ -25,11 +25,11 @@ CClientCommand g_ReportMetahookPlugin("mh_reportplugin", "ReportPluginInfo", @Re
 
 void MapInit() {
   metachads = 0;
-  valid.Resize(0);
+  valid.resize(0);
 
   dictionary keys = {
     { "targetname", "_MetaChads" },
-    { bitskey, "" + metachads }
+    { bitskey, string_t(metachads) }
   };
   CBaseEntity@ ent = g_EntityFuncs.CreateEntity("info_target", keys, true);
   chadent = g_EntityFuncs.EntIndex(ent.edict());
@@ -81,7 +81,7 @@ void RequestPlugins(EHandle eplr) {
 
   const string szSteamId = g_EngineFuncs.GetPlayerAuthId(plr.edict());
   valid.insertLast(szSteamId);
-  g_Scheduler.SetTimeout("Invalid", 2.0f, szSteamId);
+  g_Scheduler.SetTimeout("Invalid", 1.0f, szSteamId);
 
   NetworkMessage message(MSG_ONE, NetworkMessages::NetworkMessageType(146), plr.edict());
     message.WriteLong(1); // Query plugin list
@@ -106,7 +106,7 @@ void UpdateEnt() {
   if (chadent != -1) {
     CBaseEntity@ ent = g_EntityFuncs.Instance(chadent);
     CustomKeyvalues@ chadkv = ent.GetCustomKeyvalues();
-    chadkv.SetKeyvalue(bitskey, "" + metachads);
+    chadkv.SetKeyvalue(bitskey, string_t(metachads));
   }
 }
 

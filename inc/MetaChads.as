@@ -1,6 +1,6 @@
 // Query MetaChads: const bool IsMetaChad(CBasePlayer@);
 //
-// If used early (eg. ClientPutInServer), use SetTimeout("func", 3.0f) (at least >2.0f!)
+// If used early (eg. ClientPutInServer), use SetTimeout("func", 2.0f) (at least >1.0f!)
 // so the client has enough time to report back, otherwise it is probably a race condition
 //
 // Requires MetaHook.as
