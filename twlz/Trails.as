@@ -338,6 +338,7 @@ void MetaHookSpecial(EHandle eplr) {
 
   if (IsMetaChad(plr) && !g_player_states[idx].dlight) {
     g_player_states[idx].dlight = true;
+    UpdatePersist(plr);
     g_PlayerFuncs.ClientPrint(plr, HUD_PRINTTALK, PREFIX + "DLights were auto-enabled because you are a MetaChad.\n");
   }
 }
