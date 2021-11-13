@@ -472,8 +472,8 @@ void Trail(CBasePlayer@ plr) {
     g_player_states[idx].lasths = V(hue, saturation);
 
     const RGBA color = FetchColor(hue, saturation, ColorValue(g_player_states[idx].trailcount, speed));
-    const uint8 life = g_player_states[idx].lastlife = Math.clamp(10, 255, uint(floor((speed*(PHI/2)+g_player_states[idx].trailcount)*(3/PHI)/(g_player_states[idx].lastlife == 0 ? 3/PHI : 1))));
-    //g_player_states[idx].lastlife = uint8(floor((life*(PHI-1))+0.5f)); // hack: shorther trails
+    const uint8 life = g_player_states[idx].lastlife = Math.clamp(10, 255, uint(ceil((speed*(PHI/2)+g_player_states[idx].trailcount)*(3/PHI)/(g_player_states[idx].lastlife == 0 ? 3/PHI : 1))));
+    //g_player_states[idx].lastlife = uint8(ceil((life*(PHI-1))+0.5f)); // hack: shorther trails
 
     if (g_player_states[idx].trailent > 0) {
       CustomPlayerTrail@ trail = GetTrailEnt(idx);
@@ -876,11 +876,11 @@ class CustomPlayerTrail : ScriptBaseEntity {
               m2.WriteCoord(self.pev.origin.x);
               m2.WriteCoord(self.pev.origin.y);
               m2.WriteCoord(self.pev.origin.z);
-              m2.WriteByte(Math.clamp(6, 10, self.pev.iuser1+5));
+              m2.WriteByte(Math.clamp(6, 10, ((detached && islast) ? self.pev.iuser2 : self.pev.iuser1) + 5));
               m2.WriteByte(dlcolor.r);
               m2.WriteByte(dlcolor.g);
               m2.WriteByte(dlcolor.b);
-              m2.WriteByte(detached ? (islast ? life : 2) : g_player_states[owneridx].lastlife);
+              m2.WriteByte(detached ? (islast ? life : 6) : g_player_states[owneridx].lastlife);
               m2.WriteByte(1);
             m2.End();
           }
@@ -934,7 +934,8 @@ class CustomPlayerTrail : ScriptBaseEntity {
 
       if (islast) {
         self.pev.velocity = BoundVelocity(self.pev.velocity + (self.pev.velocity.Normalize() * pow(self.pev.iuser1, 3/PHI)));
-        self.pev.iuser1   = -1;
+        self.pev.iuser2 = self.pev.iuser1;
+        self.pev.iuser1 = -1;
 
         NetworkMessage m(MSG_PVS, NetworkMessages::SVC_TEMPENTITY, self.pev.origin);
           m.WriteByte(TE_GLOWSPRITE);
