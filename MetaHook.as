@@ -120,7 +120,6 @@ void UpdateEnt() {
     CBaseEntity@ ent = g_EntityFuncs.Instance(chadent);
     CustomKeyvalues@ chadkv = ent.GetCustomKeyvalues();
     chadkv.SetKeyvalue(bitskey, string_t(string(metachads)));
-    g_EngineFuncs.ServerPrint("[MetaHookDebug] "  +atoui((chadkv.GetKeyvalue(bitskey)).GetString()) + "\n");
   }
 }
 
