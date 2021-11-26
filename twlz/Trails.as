@@ -1,6 +1,7 @@
 // TODO:
 // - trail vs. semiclip stuck?
 // - trail menu (lol)
+// - remove external/trigger_push velocity somehow (map virtualreality conveyor belts good to test that)
 
 #include "inc/RelaySay"
 #include "inc/MetaChads"
@@ -68,6 +69,7 @@ class PlayerState : PlayerPersist {
   }
 
   bool ishere;
+  bool isglowing;
   string name;
   float nexttrailthink;
   float nextglowthink;
@@ -399,6 +401,8 @@ void RestoreRenderMode(CBasePlayer@ plr) {
   plr.pev.renderfx    = plr.m_iOriginalRenderFX;
   plr.pev.renderamt   = plr.m_flOriginalRenderAmount;
   plr.pev.rendercolor = plr.m_vecOriginalRenderColor;
+
+  g_player_states[plr.entindex()].isglowing = false;
 }
 
 const bool IsFast(CBasePlayer@ plr, const uint speed) {
@@ -415,7 +419,7 @@ void Trail(CBasePlayer@ plr) {
   const bool glowstuff = (g_player_states[idx].glow && g_player_states[idx].trailcount > 1) ? true : false;
 
   if( !plr.IsMoving() || plr.pev.FlagBitSet(FL_FROZEN) ) {
-    if (glowstuff)
+    if (g_player_states[idx].isglowing)
       RestoreRenderMode(plr);
     KillTrail(idx);
   }
@@ -425,7 +429,7 @@ void Trail(CBasePlayer@ plr) {
     //const uint tresh = uint(floor(plr.GetMaxSpeed()*(((PHI-1)*3)*(PHI-1)))*0.1f); // easier
 
     if ( speed < tresh ) {
-      if (glowstuff)
+      if (g_player_states[idx].isglowing)
         RestoreRenderMode(plr);
       KillTrail(idx);
       return;
@@ -448,6 +452,7 @@ void Trail(CBasePlayer@ plr) {
         plr.pev.rendercolor.z = gcolor.b;
       }
 
+      g_player_states[idx].isglowing = true;
       g_player_states[idx].nextglowthink = g_Engine.time + 0.2f;
     }
 
