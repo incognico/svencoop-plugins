@@ -93,7 +93,7 @@ void RequestPlugins(EHandle eplr) {
 
   const string szSteamId = g_EngineFuncs.GetPlayerAuthId(plr.edict());
   valid.insertLast(szSteamId);
-  g_Scheduler.SetTimeout("Invalid", 1.0f, szSteamId);
+  g_Scheduler.SetTimeout("Invalid", 2.0f, szSteamId);
 
   NetworkMessage message(MSG_ONE, NetworkMessages::NetworkMessageType(146), plr.edict());
     message.WriteLong(1); // Query plugin list

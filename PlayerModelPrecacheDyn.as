@@ -101,11 +101,11 @@ void MapInit() {
     keys["$s_model" + i] = precachedModels[i];
   }
   g_EntityFuncs.CreateEntity( "info_target", keys, true );
-
-  g_ModelList.resize( 0 );
   
   g_LastModelList = g_ModelList;
   g_last_precache_map = g_Engine.mapname;
+  
+  g_ModelList.resize( 0 );
 }
 
 bool playerModelFileExists(string path) {

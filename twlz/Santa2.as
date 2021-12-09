@@ -1,4 +1,4 @@
-#include "MapBlacklist"
+#include "inc/MapBlacklist"
 
 // settings
 const bool g_togglesolid        = true;
@@ -12,7 +12,7 @@ const string g_healthmodel      = "models/xmas/alberto309/present1.mdl";
 const string g_batterymodel     = "models/xmas/alberto309/present2.mdl";
 const string g_painsound        = "christmas/bell4.ogg";
 const string g_effectsound      = "christmas/bell3.ogg";
-const array<string> g_monsters  = { "monster_headcrab", "monster_babycrab", "monster_snark", "monster_shockroach" }; // "monster_cockroach", "monster_rat" // "monster_chumtoad" too strong
+const array<string> g_monsters  = { "monster_headcrab", "monster_babycrab", "monster_shockroach" }; // "monster_cockroach", "monster_rat" // "monster_chumtoad" too strong
 
 const array<string> bibabearsounds = {
 'bear_death2.ogg',
@@ -157,14 +157,14 @@ void MapInit() {
         g_Game.PrecacheMonster( g_monsters[i], false );
     }
     g_Game.PrecacheMonster( "monster_gonome", true );
-	g_Game.PrecacheMonster( "monster_bullchicken", true );
+    g_Game.PrecacheMonster( "monster_bullchicken", true );
 
     g_Game.PrecacheGeneric ( 'sound/' + g_painsound );
     g_Game.PrecacheGeneric ( 'sound/' + g_effectsound );
     g_SoundSystem.PrecacheSound( g_painsound );
     g_SoundSystem.PrecacheSound( g_effectsound );
-	
-	for ( uint i = 0; i < bibabearsounds.length(); ++i ) {
+
+   for ( uint i = 0; i < bibabearsounds.length(); ++i ) {
         g_Game.PrecacheGeneric( "sound/bibabear/" + bibabearsounds[i] );
         g_SoundSystem.PrecacheSound( "bibabear/" + bibabearsounds[i] );
     }
@@ -277,7 +277,7 @@ HookReturnCode PlayerKilled( CBasePlayer@ pPlayer, CBaseEntity@ pAttacker, int i
 
         case 9:
         {
-		    bool biba = false;
+            bool biba = false;
             if ( Math.RandomLong(0, 1) == 0 )
                 biba = true;
 
@@ -302,7 +302,7 @@ HookReturnCode PlayerKilled( CBasePlayer@ pPlayer, CBaseEntity@ pAttacker, int i
                 { "displayname", "Festive Helper of " + pPlayer.pev.netname },
                 { "is_not_revivable", "1" },
                 { "freeroam", "1" },
-				{ "soundlist", "../../maps/santashappy.gsr" },
+                { "soundlist", "../../maps/santashappy.gsr" },
                 { "spawnflags", "4" }
             };
 
