@@ -19,9 +19,9 @@ RedSprend | https://github.com/RedSprend/svencoop_plugins | multiple
 Paranoid_AF | https://github.com/Paranoid-AF/SvenCoop_Plugins | multiple
 MrOats | https://github.com/MrOats/AngelScript_SC_Plugins | multiple
 Rizulix | https://github.com/Rizulix/Random-Plugins | multiple
-DrAbcrealone | https://github.com/DrAbcrealone/AngelScripts | multiple
+DrAbcOfficial | https://github.com/DrAbcOfficial/AngelScripts | multiple
 kmkz27 | https://github.com/kmkz27/Sven-Co-op-scripts | multiple
-CubeMath | https://github.com/CubeMath/UCHFastDL2/tree/master/svencoop/scripts/plugins | multiple
+CubeMath | [https://github.com/CubeMath/UCHFastDL2/[...]/plugins](https://github.com/CubeMath/UCHFastDL2/tree/master/svencoop/scripts/plugins) | multiple
 ltibm | https://github.com/ltibm?tab=repositories | multiple
 Zode | https://github.com/Zode/AFBase | AFBase
 Zode | https://github.com/Zode/AFBaseExpansions | AFBaseExpansions
