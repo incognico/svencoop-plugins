@@ -12,6 +12,7 @@ bool precached = false;
 dictionary g_SoundList;
 dictionary g_Pitch;
 dictionary g_Mutes;
+dictionary g_Vols;
 array<uint> g_ChatTimes(33);
 array<string> @g_SoundListKeys;
 size_t filesize;
@@ -20,6 +21,7 @@ CClientCommand g_ListSounds("listsounds", "List all chat sounds", @listsounds);
 CClientCommand g_CSPitch("cspitch", "Sets the pitch at which your ChatSounds play (25-255)", @cspitch);
 CClientCommand g_CSStats("csstats", "Sound usage stats", @cs_stats);
 CClientCommand g_CSMute("csmute", "Mute sounds from player", @csmute);
+CClientCommand g_CSVol("csvol", "Change sound volume for all players", @csvol);
 CClientCommand g_writecsstats("writecsstats", "Write sound usage stats", @writecsstats_cmd, ConCommandFlag::AdminOnly);
 
 void PluginInit() {
@@ -147,6 +149,13 @@ void csmute(const CCommand@ pArgs) {
     setmute(steamId, pArgs[1], pPlayer);
 }
 
+void csvol(const CCommand@ pArgs) {
+    CBasePlayer@ pPlayer = g_ConCommandSystem.GetCurrentPlayer();
+    const string steamId = g_EngineFuncs.GetPlayerAuthId(pPlayer.edict());
+
+    setvol(steamId, pArgs[1], pPlayer);
+}
+
 bool isNumeric(string arg) {
     if (arg.Length() == 0) {
         return false;
@@ -207,7 +216,15 @@ void play_chat_sound(CBasePlayer@ speaker, SOUND_CHANNEL channel, string snd, fl
 			}
 		}
 		
-		g_SoundSystem.PlaySound(speaker.edict(), channel, snd, volume, attenuation, 0, pitch, plr.entindex());
+		int vol = 100;
+		if (g_Vols.exists(steamid)) {
+			g_Vols.get(steamid, vol);
+		}
+		float localVol = float(vol / 100.0f)*volume;
+		
+		if (localVol > 0) {
+			g_SoundSystem.PlaySound(speaker.edict(), channel, snd, localVol, attenuation, 0, pitch, plr.entindex());
+		}
 	}
 }
 
@@ -291,6 +308,12 @@ HookReturnCode ClientSay(SayParameters@ pParams) {
             const string steamId = g_EngineFuncs.GetPlayerAuthId(pPlayer.edict());
             pParams.ShouldHide = true;
             setmute(steamId, pArguments[1], pPlayer);
+        }
+		else if (pArguments.ArgC() > 0 && soundArg == '.csvol') {
+            CBasePlayer@ pPlayer = pParams.GetPlayer();
+            const string steamId = g_EngineFuncs.GetPlayerAuthId(pPlayer.edict());
+            pParams.ShouldHide = true;
+            setvol(steamId, pArguments[1], pPlayer);
         }
         else if (pArguments.ArgC() > 0 && soundArg == '.csstats') {
             CBasePlayer@ pPlayer = pParams.GetPlayer();
@@ -403,6 +426,26 @@ void setmute(const string steamId, const string val, CBasePlayer@ pPlayer) {
 	}
 	
 	g_Mutes[steamId] = muteList;
+}
+
+void setvol(const string steamId, const string val, CBasePlayer@ pPlayer) {
+	if (val.Length() == 0) {
+		int curVol = 100;
+		if (g_Vols.exists(steamId)) {
+			g_Vols.get(steamId, curVol);
+		}
+		
+		g_PlayerFuncs.SayText(pPlayer, "[ChatSounds] Volume is currently at " + curVol + "%\n");
+		return;
+	}
+	
+	int newvol = atoi(val);
+	if (newvol < 0) newvol = 0;
+	if (newvol > 100) newvol = 100;
+	
+	g_Vols[steamId] = newvol;
+	
+	g_PlayerFuncs.SayText(pPlayer, "[ChatSounds] Volume set to " + newvol + "%\n");
 }
 
 const int clampPitch(const int val) {
