@@ -18,6 +18,8 @@ dictionary ips;
 const string g_key_caller = "$s_twlz_relay_caller";
 const string g_key_msg    = "$s_twlz_relay_msg";
 
+CConCommand@ cmdRelaySay;
+
 void PluginInit() {
   g_Module.ScriptInfo.SetAuthor("incognico");
   g_Module.ScriptInfo.SetContactInfo("https://discord.gg/qfZxWAd");
@@ -28,6 +30,8 @@ void PluginInit() {
   g_Hooks.RegisterHook(Hooks::Player::ClientConnected, @ClientConnected);
   g_Hooks.RegisterHook(Hooks::Player::ClientPutInServer, @ClientPutInServer);
   g_Hooks.RegisterHook(Hooks::Player::ClientDisconnect, @ClientDisconnect);
+  
+  @cmdRelaySay = @CConCommand( "relay_say", "Send a message to the chat bridge plugin", @relaySayCmd );
 
   TruncateFromSven();
 
@@ -258,4 +262,19 @@ HookReturnCode ClientConnected( edict_t@, const string& in szPlayerName, const s
   ips[szPlayerName] = szIPAddress;
 
   return HOOK_CONTINUE;
+}
+
+// metamod doesn't trigger EntityCreated hook so here is another way to send messages across plugins
+void relaySayCmd( const CCommand@ args )
+{
+	CBasePlayer@ plr = g_ConCommandSystem.GetCurrentPlayer();
+	
+	string caller = args[1];
+	
+	// using a separate cvar to store the message in case someone tries playing "; rcon_password 123;" on the radio
+	string message = g_EngineFuncs.CVarGetString("relay_say_msg");
+	
+	if ( !caller.IsEmpty() && !message.IsEmpty() ) {
+		AppendFromSven( "plugin " + caller + " " + message + "\n" );
+	}
 }
