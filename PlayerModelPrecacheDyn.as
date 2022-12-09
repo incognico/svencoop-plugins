@@ -1,5 +1,7 @@
 // IMPORTANT:
-// You need to create a symlink: svencoop_addon/models/player -> svencoop_addon/scripts/plugins/store/playermodelfolder
+// You need to create two symlinks:
+//        svencoop/models/player -> svencoop_addon/scripts/plugins/store/playermodelfolder_default
+//        svencoop_addon/models/player -> svencoop_addon/scripts/plugins/store/playermodelfolder_addon
 // LOL SECURITY VIOLATION USE AT OWN RISK LOL
 
 const string g_pmodel_folder_default = "scripts/plugins/store/playermodelfolder_default/"; // Tailing /
@@ -73,18 +75,18 @@ void MapInit() {
     string tmodel = g_ModelList[i] + "/" + g_ModelList[i] + "t.mdl";
     string pic = g_ModelList[i] + "/" + g_ModelList[i] + ".bmp";
     
-    if ( playerModelFileExists(tmodel) ) {
-      g_Game.PrecacheGeneric( "models/player/" + tmodel );
-    }
-
     if ( playerModelFileExists(model) ) {
-      string path = "models/player/" + model;
-	  if (path.Length() < 65) {
-	    g_Game.PrecacheModel( "models/player/" + model );
+      const string path = "models/player/" + model;
+      if (path.Length() < 65) {
+        g_Game.PrecacheModel( path );
         precachedModels.insertLast(g_ModelList[i]);
-	  } else {
-	    g_Log.PrintF("[PlayerModelPrecacheDyn] Player model precache failed (65+ chars): " + path + "\n");
-	  }
+
+        if ( playerModelFileExists(tmodel) && path.Length()+1 < 65 ) {
+          g_Game.PrecacheGeneric( "models/player/" + tmodel );
+        }
+      } else {
+        g_Log.PrintF("[PlayerModelPrecacheDyn] Player model precache failed (65+ chars): " + path + "\n");
+      }
     } else {
         g_missing_list.insertLast(g_ModelList[i]);
     }
