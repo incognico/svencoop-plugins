@@ -1,10 +1,18 @@
+int MAX_ANNOYANCE_TIME = 60; // number of seconds a player can use an annoying model
+int ANNOYANCE_REGAIN_TIME = 2; // seconds regained per hour that the player can use towards annoying model usage
+
+void print(string text) { g_Game.AlertMessage( at_console, text); }
+void println(string text) { print(text + "\n"); }
+
 const array<string> g_CrashModelList = {
 'axis2_s5',
 'tomb_rider',
 'white_suit',
 'axis2_s5_v2',
 'tomb_rider_v2',
-'white_suit_v2'
+'white_suit_v2',
+'kz_rindo_swc',
+'vtuber_filian_sw'
 };
 
 const array<string> g_AnnoyingModelList = {
@@ -53,24 +61,35 @@ const array<string> g_AnnoyingModelList = {
 'sprt_xwing',
 'tank_mbt',
 'taskforcecar',
+'treeshit',
 'truck',
 'vehicleshit_tigerii',
 'vehicleshit_m1a1_abrams',
 'vehicleshit_submarine',
-'obamium'
+'obamium',
+'gigacirno_v2',
+'snarkgarg'
 };
+
+DateTime last_annoying_psa;
+const int annoying_psa_delay = 60*30;
 
 void PluginInit() {
   g_Module.ScriptInfo.SetAuthor( "incognico" );
   g_Module.ScriptInfo.SetContactInfo( "https://discord.gg/qfZxWAd" );
 
   g_Scheduler.SetInterval( "Periodic", 1.11f );
+  g_Scheduler.SetInterval( "fastcheck", 0.0f );
 }
 
 void Periodic() {
   CheckPlayerSinking();
-  CrashModelCheck();
+  AnnoyingModelSurvivalSwap();
   SemiDeadFix();
+}
+
+void fastcheck() {
+	CrashModelCheck();
 }
 
 void CheckPlayerSinking() {
@@ -95,20 +114,36 @@ void CheckPlayerSinking() {
   }
 }
 
+void AnnoyingModelSurvivalSwap() {
+	for( int i = 1; i <= g_Engine.maxClients; ++i ) {
+		CBasePlayer@ plr = g_PlayerFuncs.FindPlayerByIndex( i );
+
+		if (plr is null or !plr.IsConnected()) {
+			continue;
+		}
+		
+		KeyValueBuffer@ pInfos = g_EngineFuncs.GetInfoKeyBuffer( plr.edict() );
+		
+		bool isAnnoying = g_AnnoyingModelList.find( pInfos.GetValue( "model" ).ToLowercase() ) >= 0;
+		
+		if (isAnnoying and g_SurvivalMode.IsActive()) {
+			g_PlayerFuncs.ClientPrint( plr, HUD_PRINTTALK, "[Warning] Don\'t use player model \'" + pInfos.GetValue( "model" ) + "\' during survival. It obscures views!\n" );
+			pInfos.SetValue( "model", "helmet" );
+		}
+	}
+}
+
 void CrashModelCheck() {
+	
   for( int i = 1; i <= g_Engine.maxClients; ++i ) {
     CBasePlayer@ pPlayer = g_PlayerFuncs.FindPlayerByIndex( i );
 
     if( pPlayer !is null ) {
       KeyValueBuffer@ pInfos = g_EngineFuncs.GetInfoKeyBuffer( pPlayer.edict() );
+	  string modelName = pInfos.GetValue( "model" ).ToLowercase();
 
-      if( g_CrashModelList.find( pInfos.GetValue( "model" ).ToLowercase() ) >= 0 )  {
+      if( g_CrashModelList.find( modelName ) >= 0 )  {
         g_PlayerFuncs.ClientPrint( pPlayer, HUD_PRINTTALK, "[Warning] Don\'t use player model \'" + pInfos.GetValue( "model" ) + "\', it is prone to crash clients!\n" );
-        pInfos.SetValue( "model", "helmet" );
-      }
-	  
-	  if( g_SurvivalMode.IsEnabled() and g_AnnoyingModelList.find( pInfos.GetValue( "model" ).ToLowercase() ) >= 0 )  {
-        g_PlayerFuncs.ClientPrint( pPlayer, HUD_PRINTTALK, "[Warning] Don\'t use player model \'" + pInfos.GetValue( "model" ) + "\' during survival. It obscures views!\n" );
         pInfos.SetValue( "model", "helmet" );
       }
     }
