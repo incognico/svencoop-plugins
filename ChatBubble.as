@@ -19,7 +19,7 @@ array<EHandle> g_typing_sprites;
 
 void PluginInit()
 {
-    g_Module.ScriptInfo.SetAuthor( "incognico & w00tguy" );
+    g_Module.ScriptInfo.SetAuthor( "incognico" );
     g_Module.ScriptInfo.SetContactInfo( "https://discord.gg/qfZxWAd" );
 
     g_Hooks.RegisterHook( Hooks::Player::ClientSay, @ClientSay );
@@ -101,7 +101,8 @@ void StartChatMode( CBasePlayer@ plr, string spritePath )
         
         g_typing_sprites[plr.entindex()] = sprite;
 
-        if ( g_PlayerFuncs.AdminLevel( plr ) >= ADMIN_YES && !g_SurvivalMode.IsActive() && plr.IsAlive() )
+		bool isBarnacled = plr.m_afPhysicsFlags & PFLAG_ONBARNACLE != 0;
+        if ( g_PlayerFuncs.AdminLevel( plr ) >= ADMIN_YES && !g_SurvivalMode.IsActive() && plr.IsAlive() && !isBarnacled )
             plr.pev.flags |= FL_NOTARGET;
     }
 }
