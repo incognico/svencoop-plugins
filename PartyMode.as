@@ -1,5 +1,3 @@
-#include "inc/RelaySay"
-
 const int g_MaxVotes = 3; // times per map party mode can be enabled
 const int g_VoteWaitTime = 300; // time in seconds between a new vote (on or off) is possible
 //const string g_PartySound = "svencoop2/stadium3.wav"; // path to some sound in sound/ to play when PM was enabled or remove lines 30,31,85
@@ -42,16 +40,22 @@ HookReturnCode MapChange() {
 
 HookReturnCode ClientSay(SayParameters@ pParams) {
   const CCommand@ pArguments = pParams.GetArguments();
+  CBasePlayer@ pPlayer = pParams.GetPlayer();
 
   if (pArguments.ArgC() > 0 && (pArguments.Arg(0).ToLowercase() == "party?" || pArguments.Arg(0).ToLowercase() == "partymode" || pArguments.Arg(0).ToLowercase() == "partymode?")) {
     if (g_LastVoteTime != 0 && (uint(g_EngineFuncs.Time()) - g_LastVoteTime) < g_VoteWaitTime) {
-      if (g_VoteCount < g_MaxVotes)
-        g_PlayerFuncs.ClientPrintAll(HUD_PRINTTALK, "[Info] Calm down, there was a vote little time ago already.\n");
-      //return HOOK_HANDLED;
+      g_PlayerFuncs.ClientPrint(pPlayer, HUD_PRINTTALK, "[Info] Calm down, there was a vote little time ago already.\n");
+	  pParams.ShouldHide = true;
+	  return HOOK_HANDLED;
+    }
+	if (g_SurvivalMode.IsEnabled() || g_SurvivalMode.IsActive()) {
+      g_PlayerFuncs.ClientPrint(pPlayer, HUD_PRINTTALK, "[Info] Party mode disabled during survival.\n");
+	  pParams.ShouldHide = true;
+	  return HOOK_HANDLED;
     }
     //if () {
     //  g_PlayerFuncs.ClientPrintAll(HUD_PRINTTALK, "[Info] Voting is currently not allowed.\n");
-    //  //return HOOK_HANDLED;
+    //  return HOOK_HANDLED;
     //}
 
     if (g_pThinkFunc !is null) {
@@ -72,10 +76,10 @@ HookReturnCode ClientSay(SayParameters@ pParams) {
       PMVote.SetVoteBlockedCallback(@PMVoteBlocked);
       PMVote.SetVoteEndCallback(@PMVoteEnd);
       PMVote.Start();
+      g_VoteCount++;
     }
-    //return HOOK_HANDLED;
+    return HOOK_HANDLED;
   }
-
   return HOOK_CONTINUE;
 }
 
@@ -87,12 +91,9 @@ void PMVoteEnd(Vote@ pVote, bool fResult, int) {
   g_LastVoteTime = uint(g_EngineFuncs.Time());
 
   if (pVote.GetName() == "PartyOn") {
-    g_VoteCount++;
-
     if (fResult) {
       StartPartyMode();
       g_PlayerFuncs.ClientPrintAll(HUD_PRINTTALK, "[Info] LOL PARTY LOL PARTY LOL PARTY!\n");
-      RelaySay("LOL PARTY LOL PARTY LOL PARTY!");
       g_SoundSystem.PlaySound(g_EntityFuncs.IndexEnt(0), CHAN_STATIC, g_PartySound, 1.0f, ATTN_NONE, 0, 100);
     }
     else {
@@ -103,7 +104,6 @@ void PMVoteEnd(Vote@ pVote, bool fResult, int) {
     if (fResult) {
       StopPartyMode();
       g_PlayerFuncs.ClientPrintAll(HUD_PRINTTALK, "[Info] The party is over. Go home.\n");
-      RelaySay("The party is over. Go home.");
     }
     else {
       g_PlayerFuncs.ClientPrintAll(HUD_PRINTTALK, "[Info] YAY MORE PARTY LOL! :D:D:D\n");
@@ -142,8 +142,10 @@ void StartPartyModeCmd(const CCommand@ pArgs) {
 
   if (g_PlayerFuncs.AdminLevel(pCaller) < ADMIN_YES)
     g_PlayerFuncs.ClientPrint(pCaller, HUD_PRINTCONSOLE, "You have no access to this command.\n");
-  else
+  else {
+    g_Log.PrintF("[Admin] " + pCaller.pev.netname + " did .partymodeon\n");
     StartPartyMode();
+  }
 }
 
 void StartPartyMode() {
@@ -158,8 +160,14 @@ void StartPartyMode() {
       @edict = @g_EntityFuncs.IndexEnt(i);
       @pEntity = g_EntityFuncs.Instance(edict);
 
-      if (pEntity !is null && (pEntity.IsBSPModel() || pEntity.IsMonster() || pEntity.IsPointEnt()))
+      if (pEntity !is null && (pEntity.IsBSPModel() || pEntity.IsMonster() || pEntity.IsPointEnt())) {
+	    string tname = pEntity.pev.targetname;
+	    if (tname.Find("as_view_wep_") == 0 || tname.Find("plugin_ghost_") == 0) {
+		    // don't touch ghosts or view hands (messes up env_render_individual)
+			continue;
+		}
         PushRenderMode(pEntity);
+	  }
     }
 
     @g_pThinkFunc = g_Scheduler.SetInterval("SetRandomRenderModes", 1.8f);
@@ -171,8 +179,10 @@ void StopPartyModeCmd(const CCommand@ pArgs) {
 
   if (g_PlayerFuncs.AdminLevel(pCaller) < ADMIN_YES)
     g_PlayerFuncs.ClientPrint(pCaller, HUD_PRINTCONSOLE, "You have no access to this command.\n");
-  else
+  else {
+    g_Log.PrintF("[Admin] " + pCaller.pev.netname + " did .partymodeoff\n");
     StopPartyMode();
+  }
 }
 
 void StopPartyMode(bool skip = false) {
@@ -192,8 +202,14 @@ void StopPartyMode(bool skip = false) {
       @edict = @g_EntityFuncs.IndexEnt(i);
       @pEntity = g_EntityFuncs.Instance(edict);
 
-      if (pEntity !is null && (pEntity.IsBSPModel() || pEntity.IsMonster() || pEntity.IsPointEnt()))
+      if (pEntity !is null && (pEntity.IsBSPModel() || pEntity.IsMonster() || pEntity.IsPointEnt())) {
+		string tname = pEntity.pev.targetname;
+	    if (tname.Find("as_view_wep_") == 0 || tname.Find("plugin_ghost_") == 0) {
+		    // don't touch ghosts or view hands (messes up env_render_individual)
+			continue;
+		}
         PopRenderMode(pEntity);
+	  }
     }
   }
 }

@@ -12,7 +12,8 @@ const array<string> g_CrashModelList = {
 'tomb_rider_v2',
 'white_suit_v2',
 'kz_rindo_swc',
-'vtuber_filian_sw'
+'vtuber_filian_sw',
+'lt_ugandamiku'
 };
 
 const array<string> g_AnnoyingModelList = {

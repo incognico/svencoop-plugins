@@ -30,7 +30,8 @@ const string g_voltimodel       = "models/sa13/baby_voltigore.mdl";
 const string g_painsound        = "twlz/cry.wav";
 const string g_spooksound       = "tur/scream2.wav";
 const string g_effectsound      = "twlz/trickortreat.wav";
-const array<string> g_monsters  = { "monster_headcrab", "monster_babycrab", "monster_snark", "monster_shockroach", "monster_alien_babyvoltigore" };
+//const array<string> g_monsters  = { "monster_headcrab", "monster_babycrab", "monster_snark", "monster_shockroach", "monster_alien_babyvoltigore" };
+const array<string> g_monsters  = { "monster_headcrab", "monster_babycrab", "monster_shockroach", "monster_alien_babyvoltigore" };
 const float hallostart          = 1635588000.0;
 const float halloend            = 1635807600.0;
 ///////////
@@ -42,6 +43,7 @@ CScheduledFunction@ g_SolidThink = null;
 CScheduledFunction@ g_SpookThink = null;
 bool g_SolidState = false;
 int g_ghost = 0;
+bool mapInitEverCalled = false; // so the server doesn't crash when enabling the plugin -w00t
 
 class PlayerState {
     EHandle pPlayer;
@@ -198,6 +200,8 @@ void MapInit() {
         g_Scheduler.RemoveTimer( g_SpookThink );
 
     @g_SpookThink = g_Scheduler.SetInterval( "SpookThink", 1.666f );
+	
+	mapInitEverCalled = true;
 }
 
 void MapActivate() {
@@ -220,6 +224,9 @@ HookReturnCode PlayerSpawn( CBasePlayer@ pPlayer ) {
 }
 
 HookReturnCode PlayerKilled( CBasePlayer@ pPlayer, CBaseEntity@ pAttacker, int iGib ) {
+	if (!mapInitEverCalled) {
+		return HOOK_CONTINUE;
+	}
     if ( ( pPlayer.pev.health < -40 && iGib != GIB_NEVER ) || iGib == GIB_ALWAYS )
         CreateGibs( pPlayer.pev.origin );
 
@@ -348,6 +355,10 @@ HookReturnCode PlayerKilled( CBasePlayer@ pPlayer, CBaseEntity@ pAttacker, int i
 }
 
 HookReturnCode EntityCreated( CBaseEntity@ pEnt ) {
+	if (!mapInitEverCalled) {
+		return HOOK_CONTINUE;
+	}
+	
     if ( pEnt !is null ) {
         if ( pEnt.GetClassname() == "item_healthkit" )
             g_EntityFuncs.SetModel( pEnt, g_healthmodel );
@@ -481,6 +492,10 @@ PlayerState@ getPlayerState( CBasePlayer@ pPlayer ) {
 }
 
 void SpookThink() {
+	if (!mapInitEverCalled) {
+		return;
+	}
+	
     CBaseEntity@ pEntity = null;
 
     do {

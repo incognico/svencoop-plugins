@@ -139,7 +139,7 @@ void wear(CBasePlayer@ plr, const int hatidx, bool addtopersist = true) {
   hat.pev.movetype   = MOVETYPE_FOLLOW;
   hat.pev.rendermode = kRenderNormal;
   hat.pev.colormap   = plr.pev.colormap;
-  hat.pev.targetname = "plugin_player_hat";
+  hat.pev.targetname = "bspguy_plugin_player_hat"; // bspguy_ prefix needed so hats aren't deleted when a merged map section reloads
   hat.pev.netname    = "hat \"" + hatdata.name + "\" of " + plr.pev.netname;
 
   g_EntityFuncs.SetModel(hat, "models/" + hatdata.path + ".mdl");
